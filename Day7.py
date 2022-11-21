@@ -34,8 +34,12 @@ def operation(ins):
         d[ins['output']] = ins['input1']
         
     elif op == 'AND':
-        
-        d[ins['output']] = d[ins['input1']] & d[ins['input2']]
+        if type(ins['input1']) == int:
+            d[ins['output']] = ins['input1'] & d[ins['input2']]
+        elif type(ins['input2']) == int:
+            d[ins['output']] = d[ins['input1']] & ins['input2']
+        else:
+            d[ins['output']] = d[ins['input1']] & d[ins['input2']]
     
     elif op == 'OR':
         
@@ -55,28 +59,70 @@ def operation(ins):
 
 d = dict()
 
-for i in range(len(wires)):
+while len(d) < len(wires):
 
-    instruction = wires.iloc[i]
-    task = instruction['op']
+    for i in range(len(wires)):
     
-    line_inputs = [str(instruction['input1']), str(instruction['input2'])]
-    
-    if str(instruction['input1']).isnumeric():
-        line_inputs.remove(str(instruction['input1']))
-    if str(instruction['input2']).isnumeric():
-        line_inputs.remove(str(instruction['input2']))
-    if  'nan'  in line_inputs:
-        line_inputs.remove('nan')
-    
-    if all(x in d.keys() for x in line_inputs):
-    
-        operation(instruction)
-
-    elif task == 'ASSIGN':
+        instruction = wires.iloc[i]
+        task = instruction['op']
         
-        if instruction['input1'].isnumeric():
-            d[instruction['output']] = int(instruction['input1'])
+        line_inputs = [str(instruction['input1']), str(instruction['input2'])]
+        
+        if str(instruction['input1']).isnumeric():
+            line_inputs.remove(str(instruction['input1']))
+        if str(instruction['input2']).isnumeric():
+            line_inputs.remove(str(instruction['input2']))
+        if  'nan'  in line_inputs:
+            line_inputs.remove('nan')
+        
+        if all(x in d.keys() for x in line_inputs):
+        
+            operation(instruction)
+    
+        elif task == 'ASSIGN':
             
-        elif instruction['input1'] in d.keys():
-            d[instruction['output']] = d[instruction['input1']]
+            if instruction['input1'].isnumeric():
+                d[instruction['output']] = int(instruction['input1'])
+                
+            elif instruction['input1'] in d.keys():
+                d[instruction['output']] = d[instruction['input1']]
+
+print(d['a'])
+print(d['lx'])
+
+#%%
+
+wires.loc[wires.output == 'b', 'input1'] = str(d['lx'])
+
+d = dict()
+
+while len(d) < len(wires):
+
+    for i in range(len(wires)):
+    
+        instruction = wires.iloc[i]
+        task = instruction['op']
+        
+        line_inputs = [str(instruction['input1']), str(instruction['input2'])]
+        
+        if str(instruction['input1']).isnumeric():
+            line_inputs.remove(str(instruction['input1']))
+        if str(instruction['input2']).isnumeric():
+            line_inputs.remove(str(instruction['input2']))
+        if  'nan'  in line_inputs:
+            line_inputs.remove('nan')
+        
+        if all(x in d.keys() for x in line_inputs):
+        
+            operation(instruction)
+    
+        elif task == 'ASSIGN':
+            
+            if instruction['input1'].isnumeric():
+                d[instruction['output']] = int(instruction['input1'])
+                
+            elif instruction['input1'] in d.keys():
+                d[instruction['output']] = d[instruction['input1']]
+
+print(d['a'])
+print(d['lx'])
