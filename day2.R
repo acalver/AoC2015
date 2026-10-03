@@ -14,3 +14,9 @@ rowwise(data) |>
 
 ######################## Part 2 ############################
 
+data |> 
+  rowwise() |> 
+  mutate(perimeter_min = 2 * min( height + width,  width + depth,   height + depth),
+         volume = height * width * depth) |> 
+  ungroup() |> 
+  summarize(sum(c(perimeter_min, volume)))
